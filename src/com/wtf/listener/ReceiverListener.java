@@ -1,4 +1,4 @@
-package com.wtf.controller;
+package com.wtf.listener;
 
 import java.io.IOException;
 
@@ -8,12 +8,12 @@ import com.wtf.comunications.messages.Message;
 import com.wtf.comunications.messages.ReqDispatcherRegistryMessage;
 import com.wtf.services.Dispatcher;
 
-public class ControllerReceiver implements Runnable  {
+public class ReceiverListener implements Runnable  {
 
 	private Receiver receiver;
 	private Dispatcher dispatcher; 
 
-	public ControllerReceiver(Dispatcher dispatcher){
+	public ReceiverListener(Dispatcher dispatcher){
 		this.dispatcher = dispatcher;
 		receiver = ReceiverFactory.get();
 	}

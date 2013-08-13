@@ -11,7 +11,7 @@ import com.wtf.commons.RegistrySingleton;
 import com.wtf.comunications.Forwarder;
 import com.wtf.comunications.messages.Message;
 import com.wtf.comunications.messages.ReqDispatcherRegisterMessage;
-import com.wtf.controller.ControllerReceiver;
+import com.wtf.listener.ReceiverListener;
 
 public class Dispatcher  {
 			
@@ -21,7 +21,7 @@ public class Dispatcher  {
 	public Dispatcher() throws IOException {	
 		forwarder = ForwarderFactory.get();
 		ExecutorService service = Executors.newFixedThreadPool(10);
-		service.submit(new ControllerReceiver(this));
+		service.submit(new ReceiverListener(this));
 	}
 	
 	public void registerService(Message inputMessage){
