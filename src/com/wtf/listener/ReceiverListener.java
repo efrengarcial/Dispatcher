@@ -27,6 +27,7 @@ public class ReceiverListener implements Runnable  {
 				message = receiver.receiveMessage();
 				manejarMessage(message);
 			} catch (Exception e) {
+				
 				e.printStackTrace();
 			}
 		}		
