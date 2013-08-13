@@ -21,7 +21,7 @@ public class Dispatcher  {
 
 	
 	public Dispatcher() throws IOException {
-		frecuency=0;
+		frecuency=Integer.valueOf(Configuration.FRECUENCY);
 		forwarder = ForwarderFactory.get();
 		ExecutorService service = Executors.newFixedThreadPool(10);
 		service.submit(new ReceiverListener(this));
@@ -32,10 +32,11 @@ public class Dispatcher  {
 		Entry theEntry = new Entry(input.getIpAddress() ,input.getPort(), Configuration.PROTOCOL);
 		RegistrySingleton.getInstance().put(input.getSender(), theEntry);
 		
-		Message message = new RespDispatcherRegisterMessage(Configuration.HOST, 
+		RespDispatcherRegisterMessage message = new RespDispatcherRegisterMessage(Configuration.HOST, 
 				RegistrySingleton.getInstance().getAll());
+		message.setFrecuency(frecuency);
 		forwarder.sendMessage(inputMessage.getSender() , message);
-		
+			
 		//TODO: Notiticar a todos los participantes que ha cambiado el registro
 		
 	}
