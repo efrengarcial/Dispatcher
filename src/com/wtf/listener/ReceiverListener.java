@@ -5,7 +5,8 @@ import java.io.IOException;
 import com.wtf.commons.ReceiverFactory;
 import com.wtf.comunications.Receiver;
 import com.wtf.comunications.messages.Message;
-import com.wtf.comunications.messages.ReqDispatcherRegistryMessage;
+import com.wtf.comunications.messages.ReqDispatcherRegisterMessage;
+import com.wtf.comunications.messages.ReqDispatcherUnRegisterMessage;
 import com.wtf.services.Dispatcher;
 
 public class ReceiverListener implements Runnable  {
@@ -33,8 +34,10 @@ public class ReceiverListener implements Runnable  {
 
 
 	private void manejarMessage(Message message) throws IOException {
-		if (message instanceof ReqDispatcherRegistryMessage) {
-			dispatcher.getRegistry(message);
+		if (message instanceof ReqDispatcherRegisterMessage) {
+			dispatcher.registerService(message);
+		} else if (message instanceof ReqDispatcherUnRegisterMessage) {
+			dispatcher.unregisterService(message);
 		}
 	}
 

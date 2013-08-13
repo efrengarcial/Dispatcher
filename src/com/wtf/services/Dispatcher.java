@@ -11,38 +11,47 @@ import com.wtf.commons.RegistrySingleton;
 import com.wtf.comunications.Forwarder;
 import com.wtf.comunications.messages.Message;
 import com.wtf.comunications.messages.ReqDispatcherRegisterMessage;
+import com.wtf.comunications.messages.RespDispatcherRegisterMessage;
 import com.wtf.listener.ReceiverListener;
 
 public class Dispatcher  {
 			
 	private Forwarder forwarder;		
+	private int frecuency;
 
 	
-	public Dispatcher() throws IOException {	
+	public Dispatcher() throws IOException {
+		frecuency=0;
 		forwarder = ForwarderFactory.get();
 		ExecutorService service = Executors.newFixedThreadPool(10);
 		service.submit(new ReceiverListener(this));
 	}
 	
-	public void registerService(Message inputMessage){
+	public void registerService(Message inputMessage) throws IOException{
 		ReqDispatcherRegisterMessage input = (ReqDispatcherRegisterMessage) inputMessage;
 		Entry theEntry = new Entry(input.getIpAddress() ,input.getPort(), Configuration.PROTOCOL);
 		RegistrySingleton.getInstance().put(input.getSender(), theEntry);
 		
-	}
-	
-	public void unregisterService(){
+		Message message = new RespDispatcherRegisterMessage(Configuration.HOST, 
+				RegistrySingleton.getInstance().getAll());
+		forwarder.sendMessage(inputMessage.getSender() , message);
+		
+		//TODO: Notiticar a todos los participantes que ha cambiado el registro
 		
 	}
 	
-	public void getRegistry(Message inputMessage) throws IOException{
-		Message message = new ReqDispatcherRegisterMessage(Configuration.HOST, 
-				RegistrySingleton.getInstance().getAll());
-		forwarder.sendMessage(inputMessage.getSender() , message);
+	public void unregisterService(Message inputMessage){
+		RegistrySingleton.getInstance().remove(inputMessage.getSender());
+		
+		//TODO: Notiticar a todos los participantes que ha cambiado el registro
 	}
+	
 	                              
 	public static void main(String[] args) throws IOException{
 		new Dispatcher();
+		Entry theEntry = new Entry(Configuration.IP , Integer.valueOf(Configuration.PORT), Configuration.PROTOCOL);
+		RegistrySingleton.getInstance().put(Configuration.HOST, theEntry);
+		
 	}
 	
 }
