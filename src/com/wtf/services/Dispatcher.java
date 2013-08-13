@@ -12,7 +12,8 @@ import com.wtf.comunications.Forwarder;
 import com.wtf.comunications.messages.Message;
 import com.wtf.comunications.messages.ReqDispatcherRegisterMessage;
 import com.wtf.comunications.messages.RespDispatcherRegisterMessage;
-import com.wtf.listener.ReceiverListener;
+import com.wtf.comunications.messages.RespDispatcherUnRegisterMessage;
+import com.wtf.listener.AppListener;
 
 public class Dispatcher  {
 			
@@ -21,38 +22,66 @@ public class Dispatcher  {
 
 	
 	public Dispatcher() throws IOException {
-		frecuency=Integer.valueOf(Configuration.FRECUENCY);
+		this.starUp();
+		setFrecuency(Integer.valueOf(Configuration.FRECUENCY));
 		forwarder = ForwarderFactory.get();
 		ExecutorService service = Executors.newFixedThreadPool(10);
-		service.submit(new ReceiverListener(this));
+		service.submit(new AppListener(this));
+	}
+	
+	private void starUp(){
+		Entry theEntry = new Entry(Configuration.IP , Integer.valueOf(Configuration.PORT), Configuration.PROTOCOL);
+		RegistrySingleton.getInstance().put(Configuration.lOCALHOST, theEntry);
 	}
 	
 	public void registerService(Message inputMessage) throws IOException{
 		ReqDispatcherRegisterMessage input = (ReqDispatcherRegisterMessage) inputMessage;
 		Entry theEntry = new Entry(input.getIpAddress() ,input.getPort(), Configuration.PROTOCOL);
 		RegistrySingleton.getInstance().put(input.getSender(), theEntry);
+		//Notiticar a todos los participantes que ha cambiado el registro
+		notifyChangesRegisterAll();
+	}
 		
-		RespDispatcherRegisterMessage message = new RespDispatcherRegisterMessage(Configuration.HOST, 
-				RegistrySingleton.getInstance().getAll());
-		message.setFrecuency(frecuency);
-		forwarder.sendMessage(inputMessage.getSender() , message);
-			
-		//TODO: Notiticar a todos los participantes que ha cambiado el registro
+	
+	public void unregisterService(Message inputMessage) throws IOException{
+		RegistrySingleton.getInstance().remove(inputMessage.getSender());		
+		//Notiticar a todos los participantes que ha cambiado el registro
+		notifyChangesUnRegisterAll(inputMessage);		
+	}
 		
+	
+	private void notifyChangesRegisterAll() throws IOException{
+		for (java.util.Map.Entry<String, Entry> station : RegistrySingleton.getInstance().getAll().entrySet()) {
+			if (!station.getKey().equals(Configuration.lOCALHOST)) {			
+				RespDispatcherRegisterMessage message = new RespDispatcherRegisterMessage(Configuration.lOCALHOST, 
+						RegistrySingleton.getInstance().getAll());
+				message.setFrecuency(frecuency);
+				forwarder.sendMessage(station.getKey() , message);
+			}
+		}	
 	}
 	
-	public void unregisterService(Message inputMessage){
-		RegistrySingleton.getInstance().remove(inputMessage.getSender());
-		
-		//TODO: Notiticar a todos los participantes que ha cambiado el registro
+	private void notifyChangesUnRegisterAll(Message inputMessage) throws IOException{
+		//Se envia a todos menos a el sender y Dispatcher
+		for (java.util.Map.Entry<String, Entry> station : RegistrySingleton.getInstance().getAll().entrySet()) {
+			if (!station.getKey().equals(Configuration.lOCALHOST) && !station.getKey().equals(inputMessage.getSender()) ) {			
+				RespDispatcherUnRegisterMessage message = new RespDispatcherUnRegisterMessage(Configuration.lOCALHOST, 
+						RegistrySingleton.getInstance().getAll());				
+				forwarder.sendMessage(station.getKey() , message);
+			}
+		}	
 	}
-	
 	                              
+	public int getFrecuency() {
+		return frecuency;
+	}
+
+	public void setFrecuency(int frecuency) {
+		this.frecuency = frecuency;
+	}
+
 	public static void main(String[] args) throws IOException{
-		new Dispatcher();
-		Entry theEntry = new Entry(Configuration.IP , Integer.valueOf(Configuration.PORT), Configuration.PROTOCOL);
-		RegistrySingleton.getInstance().put(Configuration.HOST, theEntry);
-		
+		new Dispatcher();		
 	}
 	
 }
