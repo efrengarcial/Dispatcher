@@ -51,7 +51,9 @@ public class Dispatcher  {
 		
 	
 	private void notifyChangesRegisterAll() throws IOException{
+		System.out.println("Estaciones registradas...");
 		for (java.util.Map.Entry<String, Entry> station : RegistrySingleton.getInstance().getAll().entrySet()) {
+			System.out.println(station.getKey() + "__"+ station.getValue().getDestinationId() +"__"+ station.getValue().getPortNr());
 			if (!station.getKey().equals(Configuration.lOCALHOST)) {			
 				RespDispatcherRegisterMessage message = new RespDispatcherRegisterMessage(Configuration.lOCALHOST, 
 						RegistrySingleton.getInstance().getAll());
@@ -62,8 +64,10 @@ public class Dispatcher  {
 	}
 	
 	private void notifyChangesUnRegisterAll(Message inputMessage) throws IOException{
+		System.out.println("Estaciones registradas...");
 		//Se envia a todos menos a el sender y Dispatcher
 		for (java.util.Map.Entry<String, Entry> station : RegistrySingleton.getInstance().getAll().entrySet()) {
+			System.out.println(station.getKey() + "__"+ station.getValue().getDestinationId() +"__"+ station.getValue().getPortNr());
 			if (!station.getKey().equals(Configuration.lOCALHOST) && !station.getKey().equals(inputMessage.getSender()) ) {			
 				RespDispatcherUnRegisterMessage message = new RespDispatcherUnRegisterMessage(Configuration.lOCALHOST, 
 						RegistrySingleton.getInstance().getAll());				
