@@ -24,7 +24,7 @@ public class Dispatcher  {
 	public Dispatcher() throws IOException {
 		this.starUp();
 		setFrecuency(Integer.valueOf(Configuration.FRECUENCY));
-		forwarder = ForwarderFactory.get();
+		forwarder = ForwarderFactory.get(Integer.parseInt(Configuration.PORT), Configuration.PROTOCOL);
 		ExecutorService service = Executors.newFixedThreadPool(10);
 		service.submit(new AppListener(this));
 	}

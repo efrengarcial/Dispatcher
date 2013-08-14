@@ -2,6 +2,7 @@ package com.wtf.listener;
 
 import java.io.IOException;
 
+import com.wtf.commons.Configuration;
 import com.wtf.commons.ReceiverFactory;
 import com.wtf.comunications.Receiver;
 import com.wtf.comunications.messages.Message;
@@ -17,7 +18,7 @@ public class AppListener implements Runnable  {
 
 	public AppListener(Dispatcher dispatcher){
 		this.dispatcher = dispatcher;
-		receiver = ReceiverFactory.get();
+		receiver = ReceiverFactory.get(Integer.parseInt(Configuration.PORT), Configuration.PROTOCOL);
 	}
 
 	@Override
