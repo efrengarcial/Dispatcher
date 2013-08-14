@@ -81,10 +81,12 @@ public class Dispatcher  {
 	}
 
 	public void setFrecuency(int frecuency) {
+		System.out.println("Frecuencia actualiza.... "+ frecuency);
 		this.frecuency = frecuency;
 	}
 
 	public static void main(String[] args) throws IOException{
+		System.out.println("Iniciando Dispatcher......");
 		new Dispatcher();		
 	}
 	
